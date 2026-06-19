@@ -196,3 +196,59 @@
   color: $color-success;
   font-weight: $font-weight-medium;
 }
+
+.transactionsSection {
+  margin-top: $spacing-xxl;
+  margin-bottom: $spacing-xxl;
+}
+
+.transactionsHeader {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+  padding: $spacing-sm 0;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.toggleHint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.toggleArrow {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.transactionsList {
+  margin-top: $spacing-md;
+}
+
+.emptyState {
+  padding: $spacing-xxl $spacing-lg;
+  text-align: center;
+  background: $color-surface-card;
+  border-radius: $radius-m;
+}
+
+.emptyText {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.emptyHint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: block;
+}

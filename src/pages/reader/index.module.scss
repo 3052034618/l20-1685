@@ -61,6 +61,21 @@
   color: $color-text-tertiary;
 }
 
+.progressBadge {
+  display: flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba(123, 95, 253, 0.1);
+  border-radius: $radius-sm;
+  margin-right: $spacing-sm;
+}
+
+.progressBadgeText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
 .coinBadge {
   display: flex;
   align-items: center;

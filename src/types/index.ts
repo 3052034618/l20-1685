@@ -30,6 +30,26 @@ export interface Task {
   isCompleted: boolean;
   progress: number;
   target: number;
+  completedAt?: number;
+}
+
+export interface TransactionRecord {
+  id: string;
+  type: 'reward' | 'consume';
+  amount: number;
+  balanceUsed?: number;
+  taskCoinUsed?: number;
+  description: string;
+  relatedId?: string;
+  createdAt: number;
+}
+
+export interface BookReadingProgress {
+  bookId: string;
+  chapterId: string;
+  scrollTop: number;
+  readPercent: number;
+  updatedAt: number;
 }
 
 export interface UserState {
@@ -38,11 +58,10 @@ export interface UserState {
   totalCoin: number;
   continuousCheckinDays: number;
   hasCheckedInToday: boolean;
+  lastCheckinDate?: string;
   unlockedChapters: string[];
-  readingProgress: {
-    chapterId: string;
-    scrollTop: number;
-  } | null;
+  readingProgress: Record<string, BookReadingProgress>;
+  transactions: TransactionRecord[];
 }
 
 export interface AppState {
@@ -54,7 +73,8 @@ export interface AppState {
 
 export type AppAction =
   | { type: 'CHECK_IN' }
-  | { type: 'COMPLETE_TASK'; payload: { taskId: string; coinReward: number } }
-  | { type: 'UNLOCK_CHAPTER'; payload: { chapterId: string; useTaskCoin: boolean; cost: number } }
-  | { type: 'SET_READING_PROGRESS'; payload: { chapterId: string; scrollTop: number } }
-  | { type: 'SET_CURRENT_CHAPTER'; payload: Chapter };
+  | { type: 'COMPLETE_TASK'; payload: { taskId: string; coinReward: number; taskTitle: string } }
+  | { type: 'UNLOCK_CHAPTER'; payload: { chapterId: string; bookId: string; useTaskCoin: boolean; cost: number; chapterTitle: string } }
+  | { type: 'SET_READING_PROGRESS'; payload: { bookId: string; chapterId: string; scrollTop: number; readPercent: number } }
+  | { type: 'SET_CURRENT_CHAPTER'; payload: Chapter }
+  | { type: 'HYDRATE_STATE'; payload: Partial<UserState> };

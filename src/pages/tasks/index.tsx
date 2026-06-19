@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { useApp } from '@/store/AppContext';
 import TaskCard from '@/components/TaskCard';
 import CoinToast from '@/components/CoinToast';
+import TransactionItem from '@/components/TransactionItem';
 import { Task } from '@/types';
 import styles from './index.module.scss';
 
@@ -13,7 +14,8 @@ const TasksPage: React.FC = () => {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastAmount, setToastAmount] = useState(0);
   const [toastMessage, setToastMessage] = useState('');
-  const { taskCoin, balance, continuousCheckinDays, hasCheckedInToday } = state.user;
+  const [showTransactions, setShowTransactions] = useState(false);
+  const { taskCoin, balance, continuousCheckinDays, hasCheckedInToday, transactions } = state.user;
   const tasks = state.tasks;
 
   const weekDays = ['一', '二', '三', '四', '五', '六', '日'];
@@ -60,7 +62,7 @@ const TasksPage: React.FC = () => {
 
     dispatch({
       type: 'COMPLETE_TASK',
-      payload: { taskId: task.id, coinReward: task.coinReward },
+      payload: { taskId: task.id, coinReward: task.coinReward, taskTitle: task.title },
     });
 
     setToastAmount(task.coinReward);
@@ -165,6 +167,36 @@ const TasksPage: React.FC = () => {
         {tasks.map((task) => (
           <TaskCard key={task.id} task={task} onComplete={handleTaskComplete} />
         ))}
+
+        <View className={styles.transactionsSection}>
+          <View
+            className={styles.transactionsHeader}
+            onClick={() => setShowTransactions(!showTransactions)}
+          >
+            <Text className={styles.sectionTitle}>交易明细</Text>
+            <View className={styles.toggleRow}>
+              <Text className={styles.toggleHint}>
+                {showTransactions ? '收起' : '展开'}
+              </Text>
+              <Text className={styles.toggleArrow}>{showTransactions ? '▲' : '▼'}</Text>
+            </View>
+          </View>
+
+          {showTransactions && (
+            <View className={styles.transactionsList}>
+              {transactions.length === 0 ? (
+                <View className={styles.emptyState}>
+                  <Text className={styles.emptyText}>暂无交易记录</Text>
+                  <Text className={styles.emptyHint}>完成任务或解锁章节后这里会显示明细</Text>
+                </View>
+              ) : (
+                transactions.map((record) => (
+                  <TransactionItem key={record.id} record={record} />
+                ))
+              )}
+            </View>
+          )}
+        </View>
       </ScrollView>
 
       <CoinToast

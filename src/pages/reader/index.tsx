@@ -13,13 +13,21 @@ const ReaderPage: React.FC = () => {
   const [readingProgress, setReadingProgress] = useState(0);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastAmount, setToastAmount] = useState(0);
+  const [initialScrollTop, setInitialScrollTop] = useState(0);
+  const [scrollKey, setScrollKey] = useState(0);
   const scrollRef = useRef<any>(null);
-  const { taskCoin, balance, unlockedChapters } = state.user;
+  const progressTimerRef = useRef<any>(null);
+  const { taskCoin, balance, unlockedChapters, readingProgress: allProgress } = state.user;
   const { books, currentChapter: stateChapter } = state;
 
   const findBookByChapterId = (chapterId: string): Book | undefined => {
     return books.find((b) => b.latestChapter.id === chapterId);
   };
+
+  const currentBook = useMemo(() => {
+    if (!currentChapter) return undefined;
+    return findBookByChapterId(currentChapter.id);
+  }, [currentChapter, books]);
 
   const currentChapter: Chapter | null = useMemo(() => {
     if (stateChapter) {
@@ -43,6 +51,25 @@ const ReaderPage: React.FC = () => {
   }, [stateChapter, books, unlockedChapters]);
 
   const isUnlocked = currentChapter ? unlockedChapters.includes(currentChapter.id) : false;
+
+  const savedProgress = useMemo(() => {
+    if (!currentBook) return null;
+    return allProgress[currentBook.id] || null;
+  }, [currentBook, allProgress]);
+
+  useEffect(() => {
+    if (savedProgress && currentChapter?.id === savedProgress.chapterId) {
+      console.log('[ReaderPage] Restoring progress for book:', currentBook?.title, 'scrollTop:', savedProgress.scrollTop);
+      setInitialScrollTop(savedProgress.scrollTop);
+      setReadingProgress(savedProgress.readPercent);
+      setScrollKey((k) => k + 1);
+    } else {
+      console.log('[ReaderPage] No saved progress, starting from top');
+      setInitialScrollTop(0);
+      setReadingProgress(0);
+      setScrollKey((k) => k + 1);
+    }
+  }, [currentBook?.id, currentChapter?.id]);
 
   const allParagraphs = useMemo(() => {
     if (!currentChapter) return [];
@@ -89,11 +116,21 @@ const ReaderPage: React.FC = () => {
     const progress = Math.round((scrollTop / totalScrollable) * 100);
     setReadingProgress(Math.min(progress, 100));
 
-    if (currentChapter && scrollTop > 0) {
-      dispatch({
-        type: 'SET_READING_PROGRESS',
-        payload: { chapterId: currentChapter.id, scrollTop },
-      });
+    if (currentChapter && currentBook && scrollTop >= 0) {
+      if (progressTimerRef.current) {
+        clearTimeout(progressTimerRef.current);
+      }
+      progressTimerRef.current = setTimeout(() => {
+        dispatch({
+          type: 'SET_READING_PROGRESS',
+          payload: {
+            bookId: currentBook.id,
+            chapterId: currentChapter.id,
+            scrollTop,
+            readPercent: Math.min(progress, 100),
+          },
+        });
+      }, 300);
     }
 
     const previewEndRatio = (previewParagraphCount / allParagraphs.length) * 100;
@@ -140,7 +177,13 @@ const ReaderPage: React.FC = () => {
 
     dispatch({
       type: 'UNLOCK_CHAPTER',
-      payload: { chapterId: currentChapter.id, useTaskCoin, cost },
+      payload: {
+        chapterId: currentChapter.id,
+        bookId: currentBook?.id || '',
+        useTaskCoin,
+        cost,
+        chapterTitle: currentChapter.title,
+      },
     });
 
     setShowUnlockModal(false);
@@ -236,6 +279,11 @@ const ReaderPage: React.FC = () => {
         <Text className={styles.chapterTitle}>{currentChapter.title}</Text>
         <View className={styles.chapterMeta}>
           <Text>{currentChapter.updateTime}</Text>
+          {savedProgress && savedProgress.readPercent > 0 && (
+            <View className={styles.progressBadge}>
+              <Text className={styles.progressBadgeText}>上次读到 {savedProgress.readPercent}%</Text>
+            </View>
+          )}
           {!isUnlocked && (
             <View className={styles.coinBadge}>
               <View className={styles.coinIcon}>币</View>
@@ -246,12 +294,13 @@ const ReaderPage: React.FC = () => {
       </View>
 
       <ScrollView
+        key={scrollKey}
         ref={scrollRef}
         className={styles.content}
         scrollY
         onScroll={handleScroll}
         scrollWithAnimation
-        scrollTop={0}
+        scrollTop={initialScrollTop}
       >
         <View className={styles.readingContent}>
           <View className={styles.previewSection}>

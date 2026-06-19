@@ -122,3 +122,63 @@
   color: $color-text-tertiary;
   font-size: $font-size-base;
 }
+
+.filterBar {
+  padding: 0 $page-padding $spacing-md;
+  margin-top: -$spacing-md;
+}
+
+.filterScroll {
+  white-space: nowrap;
+}
+
+.filterItem {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-lg;
+  margin-right: $spacing-md;
+  background: $color-surface-card;
+  border-radius: $radius-round;
+  box-shadow: $shadow-sm;
+  transition: all 0.2s ease;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &.filterItemActive {
+    @include gradient-primary;
+    box-shadow: $shadow-md;
+  }
+}
+
+.filterLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+
+  &.filterLabelActive {
+    color: $color-text-white;
+  }
+}
+
+.filterCount {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-tertiary;
+  background: $color-surface-bg;
+  padding: 2rpx 12rpx;
+  border-radius: $radius-round;
+  min-width: 36rpx;
+  text-align: center;
+
+  &.filterCountActive {
+    color: $color-primary;
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
