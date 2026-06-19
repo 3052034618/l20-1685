@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { AppState, AppAction, UserState } from '@/types';
+import { mockTasks } from '@/data/tasks';
+import { mockBooks } from '@/data/books';
 
 const initialUserState: UserState = {
   balance: 8,
-  taskCoin: 0,
-  totalCoin: 8,
+  taskCoin: 5,
+  totalCoin: 13,
   continuousCheckinDays: 3,
   hasCheckedInToday: false,
   unlockedChapters: [],
@@ -13,8 +15,8 @@ const initialUserState: UserState = {
 
 const initialState: AppState = {
   user: initialUserState,
-  books: [],
-  tasks: [],
+  books: mockBooks,
+  tasks: mockTasks,
   currentChapter: null,
 };
 
@@ -23,9 +25,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
   switch (action.type) {
     case 'CHECK_IN': {
+      if (state.user.hasCheckedInToday) {
+        console.warn('[AppContext] Already checked in today, ignoring');
+        return state;
+      }
       const checkinCoin = 5 + Math.min(state.user.continuousCheckinDays, 5);
       const newTaskCoin = state.user.taskCoin + checkinCoin;
       console.log('[AppContext] Check-in reward:', checkinCoin, 'coins');
+
+      const updatedTasks = state.tasks.map((task) =>
+        task.type === 'checkin' ? { ...task, isCompleted: true, progress: task.target } : task
+      );
+
       return {
         ...state,
         user: {
@@ -35,11 +46,23 @@ function appReducer(state: AppState, action: AppAction): AppState {
           hasCheckedInToday: true,
           continuousCheckinDays: state.user.continuousCheckinDays + 1,
         },
+        tasks: updatedTasks,
       };
     }
 
     case 'COMPLETE_TASK': {
       const { taskId, coinReward } = action.payload;
+
+      const existingTask = state.tasks.find((t) => t.id === taskId);
+      if (!existingTask) {
+        console.warn('[AppContext] Task not found:', taskId);
+        return state;
+      }
+      if (existingTask.isCompleted) {
+        console.warn('[AppContext] Task already completed:', taskId);
+        return state;
+      }
+
       const newTaskCoin = state.user.taskCoin + coinReward;
       console.log('[AppContext] Task completed:', taskId, 'reward:', coinReward);
       return {
@@ -57,16 +80,45 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'UNLOCK_CHAPTER': {
       const { chapterId, useTaskCoin, cost } = action.payload;
+
+      if (state.user.unlockedChapters.includes(chapterId)) {
+        console.warn('[AppContext] Chapter already unlocked:', chapterId);
+        return state;
+      }
+
       let newBalance = state.user.balance;
       let newTaskCoin = state.user.taskCoin;
 
       if (useTaskCoin) {
-        newTaskCoin = state.user.taskCoin - cost;
+        if (state.user.taskCoin >= cost) {
+          newTaskCoin = state.user.taskCoin - cost;
+        } else {
+          const remaining = cost - state.user.taskCoin;
+          newTaskCoin = 0;
+          newBalance = state.user.balance - remaining;
+        }
       } else {
-        newBalance = state.user.balance - cost;
+        if (state.user.balance >= cost) {
+          newBalance = state.user.balance - cost;
+        } else {
+          const remaining = cost - state.user.balance;
+          newBalance = 0;
+          newTaskCoin = state.user.taskCoin - remaining;
+        }
       }
 
-      console.log('[AppContext] Chapter unlocked:', chapterId, 'cost:', cost, 'useTaskCoin:', useTaskCoin);
+      console.log(
+        '[AppContext] Chapter unlocked:',
+        chapterId,
+        'cost:',
+        cost,
+        'preferTaskCoin:',
+        useTaskCoin,
+        'taskCoinUsed:',
+        state.user.taskCoin - newTaskCoin,
+        'balanceUsed:',
+        state.user.balance - newBalance
+      );
 
       return {
         ...state,

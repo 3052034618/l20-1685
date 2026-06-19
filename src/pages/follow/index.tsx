@@ -1,17 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
-import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro';
+import Taro, { usePullDownRefresh } from '@tarojs/taro';
 import { useApp } from '@/store/AppContext';
-import { mockBooks } from '@/data/books';
 import BookCard from '@/components/BookCard';
 import { Book } from '@/types';
 import styles from './index.module.scss';
 
 const FollowPage: React.FC = () => {
   const { state, dispatch } = useApp();
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
   const { taskCoin, balance, totalCoin } = state.user;
+
+  const followedBooks = state.books.filter((book) => book.isFollowed);
+  const books = followedBooks.map((book) => ({
+    ...book,
+    latestChapter: {
+      ...book.latestChapter,
+      isUnlocked: state.user.unlockedChapters.includes(book.latestChapter.id),
+    },
+  }));
 
   const getCurrentDate = () => {
     const now = new Date();
@@ -22,39 +28,11 @@ const FollowPage: React.FC = () => {
     return `${month}月${day}日 ${weekDay}`;
   };
 
-  const loadBooks = () => {
-    console.log('[FollowPage] Loading books...');
-    setLoading(true);
-    setTimeout(() => {
-      const followedBooks = mockBooks.filter((book) => book.isFollowed);
-      const booksWithUnlockStatus = followedBooks.map((book) => ({
-        ...book,
-        latestChapter: {
-          ...book.latestChapter,
-          isUnlocked: state.user.unlockedChapters.includes(book.latestChapter.id),
-        },
-      }));
-      setBooks(booksWithUnlockStatus);
-      setLoading(false);
-      console.log('[FollowPage] Books loaded:', booksWithUnlockStatus.length);
-    }, 500);
-  };
-
-  useEffect(() => {
-    loadBooks();
-  }, [state.user.unlockedChapters]);
-
-  useDidShow(() => {
-    console.log('[FollowPage] Page did show');
-    loadBooks();
-  });
-
   usePullDownRefresh(() => {
     console.log('[FollowPage] Pull down refresh');
-    loadBooks();
     setTimeout(() => {
       Taro.stopPullDownRefresh();
-    }, 1000);
+    }, 500);
   });
 
   const handleBookClick = (book: Book) => {
@@ -62,6 +40,8 @@ const FollowPage: React.FC = () => {
     dispatch({ type: 'SET_CURRENT_CHAPTER', payload: book.latestChapter });
     Taro.switchTab({ url: '/pages/reader/index' });
   };
+
+  console.log('[FollowPage] Rendering, books count:', books.length);
 
   return (
     <View className={styles.page}>
@@ -104,9 +84,7 @@ const FollowPage: React.FC = () => {
           <Text className={styles.updateCount}>{books.length} 本更新</Text>
         </View>
 
-        {loading ? (
-          <View className={styles.loadingState}>加载中...</View>
-        ) : books.length === 0 ? (
+        {books.length === 0 ? (
           <View className={styles.emptyState}>
             <Text className={styles.emptyIcon}>📚</Text>
             <Text className={styles.emptyText}>还没有关注的作品</Text>

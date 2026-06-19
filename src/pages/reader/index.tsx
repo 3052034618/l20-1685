@@ -1,51 +1,81 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { View, Text, Button, ScrollView } from '@tarojs/components';
 import Taro, { useDidShow } from '@tarojs/taro';
 import { useApp } from '@/store/AppContext';
-import { mockBooks } from '@/data/books';
 import UnlockModal from '@/components/UnlockModal';
 import CoinToast from '@/components/CoinToast';
-import { Chapter } from '@/types';
+import { Chapter, Book } from '@/types';
 import styles from './index.module.scss';
 
 const ReaderPage: React.FC = () => {
   const { state, dispatch } = useApp();
-  const [currentChapter, setCurrentChapter] = useState<Chapter | null>(null);
-  const [isUnlocked, setIsUnlocked] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastAmount, setToastAmount] = useState(0);
   const scrollRef = useRef<any>(null);
   const { taskCoin, balance, unlockedChapters } = state.user;
+  const { books, currentChapter: stateChapter } = state;
+
+  const findBookByChapterId = (chapterId: string): Book | undefined => {
+    return books.find((b) => b.latestChapter.id === chapterId);
+  };
+
+  const currentChapter: Chapter | null = useMemo(() => {
+    if (stateChapter) {
+      const book = findBookByChapterId(stateChapter.id);
+      if (book) {
+        return {
+          ...book.latestChapter,
+          isUnlocked: unlockedChapters.includes(book.latestChapter.id),
+        };
+      }
+      return { ...stateChapter, isUnlocked: unlockedChapters.includes(stateChapter.id) };
+    }
+    if (books.length > 0) {
+      const firstBook = books[0];
+      return {
+        ...firstBook.latestChapter,
+        isUnlocked: unlockedChapters.includes(firstBook.latestChapter.id),
+      };
+    }
+    return null;
+  }, [stateChapter, books, unlockedChapters]);
+
+  const isUnlocked = currentChapter ? unlockedChapters.includes(currentChapter.id) : false;
+
+  const allParagraphs = useMemo(() => {
+    if (!currentChapter) return [];
+    return currentChapter.content
+      .split('\n\n')
+      .filter((p) => p.trim());
+  }, [currentChapter]);
+
+  const previewParagraphCount = useMemo(() => {
+    if (!currentChapter) return 0;
+    return Math.max(
+      1,
+      Math.floor(allParagraphs.length * (currentChapter.previewRatio / 100))
+    );
+  }, [currentChapter, allParagraphs]);
+
+  const actualPreviewRatio = useMemo(() => {
+    if (allParagraphs.length === 0) return 0;
+    return Math.round((previewParagraphCount / allParagraphs.length) * 100);
+  }, [allParagraphs, previewParagraphCount]);
 
   const loadDefaultChapter = useCallback(() => {
-    if (state.currentChapter) {
-      console.log('[ReaderPage] Loading chapter from state:', state.currentChapter.title);
-      setCurrentChapter(state.currentChapter);
-      setIsUnlocked(unlockedChapters.includes(state.currentChapter.id));
-    } else {
-      const defaultBook = mockBooks[0];
-      if (defaultBook) {
-        console.log('[ReaderPage] Loading default chapter:', defaultBook.latestChapter.title);
-        setCurrentChapter(defaultBook.latestChapter);
-        setIsUnlocked(unlockedChapters.includes(defaultBook.latestChapter.id));
-      }
+    if (!state.currentChapter && books.length > 0) {
+      dispatch({ type: 'SET_CURRENT_CHAPTER', payload: books[0].latestChapter });
     }
-  }, [state.currentChapter, unlockedChapters]);
+  }, [state.currentChapter, books, dispatch]);
 
   useEffect(() => {
     loadDefaultChapter();
   }, [loadDefaultChapter]);
 
-  useEffect(() => {
-    if (currentChapter) {
-      setIsUnlocked(unlockedChapters.includes(currentChapter.id));
-    }
-  }, [currentChapter, unlockedChapters]);
-
   useDidShow(() => {
-    console.log('[ReaderPage] Page did show');
+    console.log('[ReaderPage] Page did show, chapter:', currentChapter?.title);
     loadDefaultChapter();
   });
 
@@ -53,7 +83,10 @@ const ReaderPage: React.FC = () => {
     const scrollTop = e.detail.scrollTop;
     const scrollHeight = e.detail.scrollHeight;
     const clientHeight = e.detail.clientHeight;
-    const progress = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
+    const totalScrollable = scrollHeight - clientHeight;
+    if (totalScrollable <= 0) return;
+
+    const progress = Math.round((scrollTop / totalScrollable) * 100);
     setReadingProgress(Math.min(progress, 100));
 
     if (currentChapter && scrollTop > 0) {
@@ -63,9 +96,17 @@ const ReaderPage: React.FC = () => {
       });
     }
 
-    if (!isUnlocked && currentChapter && progress >= currentChapter.previewRatio - 5) {
-      console.log('[ReaderPage] Reached lock position, showing unlock modal');
-      setShowUnlockModal(true);
+    const previewEndRatio = (previewParagraphCount / allParagraphs.length) * 100;
+    if (!isUnlocked && currentChapter && progress >= previewEndRatio - 10) {
+      if (!showUnlockModal) {
+        console.log(
+          '[ReaderPage] Reached lock position, progress:',
+          progress,
+          'previewEnd:',
+          previewEndRatio
+        );
+        setShowUnlockModal(true);
+      }
     }
   };
 
@@ -88,7 +129,14 @@ const ReaderPage: React.FC = () => {
     if (!currentChapter) return;
 
     const cost = currentChapter.coinRequired;
-    console.log('[ReaderPage] Unlocking chapter:', currentChapter.id, 'useTaskCoin:', useTaskCoin, 'cost:', cost);
+    console.log(
+      '[ReaderPage] Unlocking chapter:',
+      currentChapter.id,
+      'useTaskCoin:',
+      useTaskCoin,
+      'cost:',
+      cost
+    );
 
     dispatch({
       type: 'UNLOCK_CHAPTER',
@@ -96,7 +144,6 @@ const ReaderPage: React.FC = () => {
     });
 
     setShowUnlockModal(false);
-    setIsUnlocked(true);
 
     setToastAmount(cost);
     setToastVisible(true);
@@ -105,64 +152,47 @@ const ReaderPage: React.FC = () => {
       title: '解锁成功！',
       icon: 'success',
     });
-
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTo({
-          top: 500,
-          animated: true,
-        });
-      }
-    }, 500);
   };
 
-  const handlePrevChapter = () => {
+  const switchChapter = (offset: number) => {
     if (!currentChapter) return;
-    const currentIndex = mockBooks.findIndex(
+    const currentIndex = books.findIndex(
       (book) => book.latestChapter.id === currentChapter.id
     );
-    const prevIndex = currentIndex > 0 ? currentIndex - 1 : mockBooks.length - 1;
-    const prevChapter = mockBooks[prevIndex].latestChapter;
-    console.log('[ReaderPage] Previous chapter:', prevChapter.title);
-    setCurrentChapter(prevChapter);
-    setIsUnlocked(unlockedChapters.includes(prevChapter.id));
-    dispatch({ type: 'SET_CURRENT_CHAPTER', payload: prevChapter });
-    setReadingProgress(0);
-  };
+    const nextIndex = (currentIndex + offset + books.length) % books.length;
+    const nextChapter = books[nextIndex].latestChapter;
+    console.log('[ReaderPage] Switch chapter, offset:', offset, 'to:', nextChapter.title);
 
-  const handleNextChapter = () => {
-    if (!currentChapter) return;
-    const currentIndex = mockBooks.findIndex(
-      (book) => book.latestChapter.id === currentChapter.id
-    );
-    const nextIndex = currentIndex < mockBooks.length - 1 ? currentIndex + 1 : 0;
-    const nextChapter = mockBooks[nextIndex].latestChapter;
-    console.log('[ReaderPage] Next chapter:', nextChapter.title);
-    setCurrentChapter(nextChapter);
-    setIsUnlocked(unlockedChapters.includes(nextChapter.id));
     dispatch({ type: 'SET_CURRENT_CHAPTER', payload: nextChapter });
     setReadingProgress(0);
+
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: 0,
+        animated: false,
+      });
+    }
   };
 
-  const formatParagraphs = (content: string) => {
-    return content
-      .split('\n\n')
-      .filter((p) => p.trim())
-      .map((paragraph, index) => (
-        <Text key={index} className={styles.paragraph}>
-          {paragraph.trim()}
-        </Text>
-      ));
-  };
+  const handlePrevChapter = () => switchChapter(-1);
+  const handleNextChapter = () => switchChapter(1);
 
   const getBookTitle = () => {
     if (!currentChapter) return '';
-    const book = mockBooks.find((b) => b.latestChapter.id === currentChapter.id);
+    const book = books.find((b) => b.latestChapter.id === currentChapter.id);
     return book?.title || '';
   };
 
+  const cost = currentChapter?.coinRequired || 0;
   const totalCoin = taskCoin + balance;
-  const canUnlock = currentChapter ? totalCoin >= currentChapter.coinRequired : false;
+  const canUseTask = taskCoin >= cost;
+  const canUseBalance = balance >= cost;
+  const canUseCombo = !canUseTask && !canUseBalance && totalCoin >= cost;
+  const canUnlock = canUseTask || canUseBalance || canUseCombo;
+
+  const deficit = cost - totalCoin;
+
+  console.log('[ReaderPage] Rendering, canUnlock:', canUnlock, 'cost:', cost, 'taskCoin:', taskCoin, 'balance:', balance);
 
   if (!currentChapter) {
     return (
@@ -179,9 +209,15 @@ const ReaderPage: React.FC = () => {
     );
   }
 
-  const previewContent = formatParagraphs(currentChapter.previewContent);
-  const fullContent = formatParagraphs(currentChapter.content);
-  const remainingContent = isUnlocked ? fullContent.slice(previewContent.length) : [];
+  const previewParagraphs = allParagraphs.slice(0, previewParagraphCount);
+  const remainingParagraphs = isUnlocked ? allParagraphs.slice(previewParagraphCount) : [];
+
+  const renderParagraphs = (paragraphs: string[], startIndex: number = 0) =>
+    paragraphs.map((paragraph, idx) => (
+      <Text key={`p-${startIndex + idx}`} className={styles.paragraph}>
+        {paragraph.trim()}
+      </Text>
+    ));
 
   return (
     <View className={styles.page}>
@@ -203,7 +239,7 @@ const ReaderPage: React.FC = () => {
           {!isUnlocked && (
             <View className={styles.coinBadge}>
               <View className={styles.coinIcon}>币</View>
-              <Text>{currentChapter.coinRequired} 书币</Text>
+              <Text>{cost} 书币</Text>
             </View>
           )}
         </View>
@@ -215,13 +251,14 @@ const ReaderPage: React.FC = () => {
         scrollY
         onScroll={handleScroll}
         scrollWithAnimation
+        scrollTop={0}
       >
         <View className={styles.readingContent}>
           <View className={styles.previewSection}>
             <View className={styles.previewIndicator}>
-              免费试读 {currentChapter.previewRatio}%
+              免费试读 {actualPreviewRatio}%
             </View>
-            {previewContent}
+            {renderParagraphs(previewParagraphs, 0)}
           </View>
 
           {!isUnlocked && (
@@ -229,18 +266,18 @@ const ReaderPage: React.FC = () => {
               <Text className={styles.lockIcon}>🔒</Text>
               <Text className={styles.lockTitle}>本章为付费内容</Text>
               <Text className={styles.lockDesc}>
-                解锁后可阅读全文，支持使用任务书币
+                解锁后可阅读全文，支持任务书币与余额合并支付
               </Text>
               <View className={styles.coinRequired}>
                 <View className={styles.coinBadgeLarge}>币</View>
-                <Text className={styles.coinAmount}>{currentChapter.coinRequired} 书币</Text>
+                <Text className={styles.coinAmount}>{cost} 书币</Text>
               </View>
               <Button
                 className={styles.unlockButton}
                 onClick={handleUnlockClick}
                 disabled={!canUnlock}
               >
-                {canUnlock ? '立即解锁' : '书币不足，去做任务'}
+                {canUnlock ? '立即解锁' : `还差 ${deficit} 书币`}
               </Button>
               {!canUnlock && (
                 <Button className={styles.goTaskButton} onClick={handleGoToTasks}>
@@ -258,7 +295,7 @@ const ReaderPage: React.FC = () => {
                   已解锁 · 您已购买本章，可永久阅读
                 </Text>
               </View>
-              {remainingContent}
+              {renderParagraphs(remainingParagraphs, previewParagraphCount)}
             </>
           )}
         </View>

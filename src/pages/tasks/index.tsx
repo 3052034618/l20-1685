@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Button, ScrollView } from '@tarojs/components';
-import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro';
+import Taro, { usePullDownRefresh } from '@tarojs/taro';
 import classNames from 'classnames';
 import { useApp } from '@/store/AppContext';
-import { mockTasks } from '@/data/tasks';
 import TaskCard from '@/components/TaskCard';
 import CoinToast from '@/components/CoinToast';
 import { Task } from '@/types';
@@ -11,39 +10,19 @@ import styles from './index.module.scss';
 
 const TasksPage: React.FC = () => {
   const { state, dispatch } = useApp();
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastAmount, setToastAmount] = useState(0);
   const [toastMessage, setToastMessage] = useState('');
   const { taskCoin, balance, continuousCheckinDays, hasCheckedInToday } = state.user;
+  const tasks = state.tasks;
 
   const weekDays = ['一', '二', '三', '四', '五', '六', '日'];
 
-  const loadTasks = () => {
-    console.log('[TasksPage] Loading tasks...');
-    const updatedTasks = mockTasks.map((mockTask) => {
-      const stateTask = state.tasks.find((t) => t.id === mockTask.id);
-      return stateTask || mockTask;
-    });
-    setTasks(updatedTasks);
-    console.log('[TasksPage] Tasks loaded:', updatedTasks.length);
-  };
-
-  useEffect(() => {
-    loadTasks();
-  }, [state.tasks]);
-
-  useDidShow(() => {
-    console.log('[TasksPage] Page did show');
-    loadTasks();
-  });
-
   usePullDownRefresh(() => {
     console.log('[TasksPage] Pull down refresh');
-    loadTasks();
     setTimeout(() => {
       Taro.stopPullDownRefresh();
-    }, 1000);
+    }, 500);
   });
 
   const handleCheckin = () => {
@@ -65,14 +44,19 @@ const TasksPage: React.FC = () => {
   };
 
   const handleTaskComplete = (task: Task) => {
-    if (task.isCompleted) return;
+    console.log('[TasksPage] Task button clicked:', task.title, 'isCompleted:', task.isCompleted);
 
-    console.log('[TasksPage] Completing task:', task.title, 'reward:', task.coinReward);
+    if (task.isCompleted) {
+      console.warn('[TasksPage] Task already completed, ignoring');
+      return;
+    }
 
     if (task.type === 'checkin') {
       handleCheckin();
       return;
     }
+
+    console.log('[TasksPage] Completing task:', task.title, 'reward:', task.coinReward);
 
     dispatch({
       type: 'COMPLETE_TASK',
@@ -101,6 +85,8 @@ const TasksPage: React.FC = () => {
 
   const completedCount = tasks.filter((t) => t.isCompleted).length;
   const checkinReward = 5 + Math.min(continuousCheckinDays, 5);
+
+  console.log('[TasksPage] Rendering, completedCount:', completedCount, 'total:', tasks.length);
 
   return (
     <View className={styles.page}>

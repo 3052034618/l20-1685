@@ -13,11 +13,16 @@ interface BookCardProps {
 
 const BookCard: React.FC<BookCardProps> = ({ book, onClick }) => {
   const { state } = useApp();
-  const { totalCoin, taskCoin, balance } = state.user;
+  const { taskCoin, balance } = state.user;
   const { latestChapter } = book;
+  const totalCoin = taskCoin + balance;
 
-  const deficit = latestChapter.coinRequired - totalCoin;
-  const isEnough = deficit <= 0;
+  const cost = latestChapter.coinRequired;
+  const canUseTask = taskCoin >= cost;
+  const canUseBalance = balance >= cost;
+  const canUseCombo = !canUseTask && !canUseBalance && totalCoin >= cost;
+  const isEnough = canUseTask || canUseBalance || canUseCombo;
+  const deficit = cost - totalCoin;
 
   const handleClick = () => {
     if (onClick) {
@@ -29,13 +34,10 @@ const BookCard: React.FC<BookCardProps> = ({ book, onClick }) => {
 
   const getCoinDisplayText = () => {
     if (isEnough) {
+      if (canUseTask) return '任务书币可解锁';
+      if (canUseBalance) return '余额书币可解锁';
+      if (canUseCombo) return '可合并支付解锁';
       return '书币充足，可解锁';
-    }
-    if (taskCoin >= latestChapter.coinRequired) {
-      return `任务书币可直接解锁`;
-    }
-    if (balance >= latestChapter.coinRequired) {
-      return `余额书币可直接解锁`;
     }
     return `还差 ${deficit} 书币`;
   };
