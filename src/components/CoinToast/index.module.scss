@@ -1,0 +1,94 @@
+@use '@/styles/variables.scss' as *;
+
+.toastContainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.toastContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-xl $spacing-xxl;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: $radius-xl;
+  animation: toastIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.coinEmoji {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+  animation: coinBounce 0.6s ease-in-out;
+}
+
+@keyframes coinBounce {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-30rpx) rotate(-10deg); }
+  50% { transform: translateY(-40rpx) rotate(10deg); }
+  75% { transform: translateY(-20rpx) rotate(-5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+.coinAmount {
+  font-size: 48rpx;
+  font-weight: $font-weight-bold;
+  color: $color-coin;
+  margin-bottom: $spacing-xs;
+  @include coin-bounce;
+}
+
+.toastText {
+  font-size: $font-size-base;
+  color: $color-text-white;
+}
+
+.sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+
+  .sparkle {
+    position: absolute;
+    width: 12rpx;
+    height: 12rpx;
+    background: $color-coin;
+    border-radius: $radius-round;
+    animation: sparkle 0.8s ease-out forwards;
+
+    &:nth-child(1) { top: 20%; left: 10%; animation-delay: 0.1s; }
+    &:nth-child(2) { top: 30%; right: 15%; animation-delay: 0.2s; }
+    &:nth-child(3) { bottom: 25%; left: 20%; animation-delay: 0.3s; }
+    &:nth-child(4) { bottom: 35%; right: 10%; animation-delay: 0.15s; }
+    &:nth-child(5) { top: 15%; right: 30%; animation-delay: 0.25s; }
+    &:nth-child(6) { bottom: 20%; left: 30%; animation-delay: 0.35s; }
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0) translate(var(--tx), var(--ty));
+  }
+}

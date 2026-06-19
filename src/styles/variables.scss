@@ -1,0 +1,169 @@
+// 必须转发和使用 theme.scss
+@forward './theme.scss';
+@use './theme.scss' as *;
+
+// ============================================
+// 全局 SCSS 变量
+// ============================================
+
+// 屏幕适配（设计稿基准 750rpx）
+$screen-width: 750rpx;
+$page-padding: 32rpx;
+$page-spacing: 32rpx;
+$max-content-width: 686rpx;
+
+// 间距（8px 网格系统）
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-md: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 48rpx;
+$spacing-xxl: 64rpx;
+
+// 圆角（语义化）
+$radius-xs: 4rpx;
+$radius-sm: 8rpx;
+$radius-md: 12rpx;
+$radius-lg: 16rpx;
+$radius-xl: 20rpx;
+$radius-button: 48rpx;
+$radius-round: 999rpx;
+
+// 按钮高度
+$button-height-sm: 64rpx;
+$button-height-md: 80rpx;
+$button-height-lg: 96rpx;
+
+// 阴影（语义化）
+$shadow-card: 0 2rpx 12rpx rgba(123, 95, 253, 0.08);
+$shadow-card-hover: 0 4rpx 20rpx rgba(123, 95, 253, 0.15);
+$shadow-float: 0 4rpx 16rpx rgba(123, 95, 253, 0.12);
+$shadow-popup: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
+$shadow-coin: 0 4rpx 16rpx rgba(255, 184, 77, 0.3);
+
+// 字体大小
+$font-size-xs: 22rpx;
+$font-size-sm: 24rpx;
+$font-size-md: 26rpx;
+$font-size-base: 28rpx;
+$font-size-lg: 30rpx;
+$font-size-xl: 32rpx;
+$font-size-xxl: 40rpx;
+
+// 行高
+$line-height-tight: 1.3;
+$line-height-normal: 1.5;
+$line-height-loose: 1.8;
+$line-height-reading: 2;
+
+// 字重
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// 过渡动画
+$transition-fast: 0.15s ease;
+$transition-base: 0.25s ease;
+$transition-slow: 0.35s ease;
+$transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+// 业务变量
+$reading-bg: #FDFCFF;
+$progress-height: 8rpx;
+$coin-size: 36rpx;
+
+// ============================================
+// 常用 Mixin
+// ============================================
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-ellipsis-multi($lines: 2) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin scroll-x-container {
+  white-space: nowrap;
+}
+
+@mixin scroll-x-item($width) {
+  display: inline-block;
+  width: $width;
+  vertical-align: top;
+  white-space: normal;
+}
+
+@mixin button-reset {
+  padding: 0;
+  margin: 0;
+  line-height: normal;
+  text-align: inherit;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+
+  &::after {
+    border: none;
+  }
+}
+
+@mixin gradient-primary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+@mixin gradient-coin {
+  background: linear-gradient(135deg, $color-coin 0%, $color-coin-light 100%);
+}
+
+@mixin card-base {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+@mixin button-active {
+  transition: all $transition-base;
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+@mixin coin-bounce {
+  animation: coinBounce 0.6s ease-in-out;
+  @keyframes coinBounce {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20rpx) scale(1.2); }
+    100% { transform: translateY(0) scale(1); }
+  }
+}

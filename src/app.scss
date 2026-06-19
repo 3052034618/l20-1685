@@ -1,0 +1,62 @@
+@use '@/styles/compat.scss';
+@use '@/styles/variables.scss' as *;
+
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+  color: $color-text-primary;
+  background: linear-gradient(180deg, #F0EEFF 0%, $color-bg-page 100%);
+  min-height: 100vh;
+}
+
+.pageContainer {
+  padding: $spacing-lg $page-padding $spacing-xxl;
+  max-width: $max-content-width;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.card {
+  @include card-base;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  @include button-active;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.tagPrimary {
+  background: rgba(123, 95, 253, 0.1);
+  color: $color-primary;
+}
+
+.tagCoin {
+  background: rgba(255, 184, 77, 0.15);
+  color: $color-coin;
+}
+
+.tagSuccess {
+  background: rgba(0, 180, 42, 0.1);
+  color: $color-success;
+}
+
+.coinText {
+  color: $color-coin;
+  font-weight: $font-weight-semibold;
+}

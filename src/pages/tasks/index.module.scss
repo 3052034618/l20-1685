@@ -1,0 +1,198 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding-bottom: $spacing-xxl;
+}
+
+.header {
+  padding: $spacing-xl $page-padding $spacing-xxl;
+  @include gradient-primary;
+  color: $color-text-white;
+  border-radius: 0 0 $radius-xl $radius-xl;
+  margin-bottom: $spacing-lg;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -100rpx;
+    right: -50rpx;
+    width: 300rpx;
+    height: 300rpx;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: $radius-round;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -80rpx;
+    left: -30rpx;
+    width: 200rpx;
+    height: 200rpx;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: $radius-round;
+  }
+}
+
+.checkinSection {
+  position: relative;
+  z-index: 1;
+}
+
+.checkinHeader {
+  @include flex-between;
+  margin-bottom: $spacing-xl;
+}
+
+.checkinTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+}
+
+.checkinDays {
+  font-size: $font-size-base;
+  opacity: 0.9;
+}
+
+.checkinCard {
+  @include card-base;
+  padding: $spacing-lg;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  box-shadow: none;
+}
+
+.checkinWeek {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.dayItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.dayCircle {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  @include flex-center;
+  margin-bottom: $spacing-xs;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all $transition-base;
+
+  &.checked {
+    @include gradient-coin;
+    box-shadow: $shadow-coin;
+  }
+
+  &.today {
+    border: 3rpx solid $color-coin;
+  }
+}
+
+.dayText {
+  font-size: $font-size-xs;
+  opacity: 0.8;
+
+  &.today {
+    color: $color-coin;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.checkinButton {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  @include gradient-coin;
+  color: $color-text-white;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  @include button-active;
+  box-shadow: $shadow-coin;
+
+  &:disabled {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+  }
+}
+
+.balanceSection {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+}
+
+.balanceCard {
+  flex: 1;
+  @include card-base;
+  padding: $spacing-md;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  box-shadow: none;
+  text-align: center;
+}
+
+.balanceLabel {
+  font-size: $font-size-xs;
+  opacity: 0.9;
+  margin-bottom: $spacing-xs;
+}
+
+.balanceValue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+}
+
+.coinIcon {
+  width: 32rpx;
+  height: 32rpx;
+  @include gradient-coin;
+  border-radius: $radius-round;
+  @include flex-center;
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}
+
+.coinNumber {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.sectionHeader {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.taskCount {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.completedCount {
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}

@@ -1,0 +1,223 @@
+@use '@/styles/variables.scss' as *;
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalContent {
+  width: 600rpx;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-xxl $spacing-xl;
+  box-shadow: $shadow-popup;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  text-align: center;
+  margin-bottom: $spacing-xl;
+}
+
+.lockIcon {
+  width: 100rpx;
+  height: 100rpx;
+  @include gradient-primary;
+  border-radius: $radius-round;
+  @include flex-center;
+  margin: 0 auto $spacing-lg;
+  font-size: 48rpx;
+  box-shadow: $shadow-float;
+}
+
+.modalTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.modalSubtitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.chapterInfo {
+  @include card-base;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-xl;
+  background: $color-bg-soft;
+}
+
+.chapterName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  text-align: center;
+  margin-bottom: $spacing-sm;
+}
+
+.coinRequired {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+}
+
+.coinBadge {
+  width: 40rpx;
+  height: 40rpx;
+  @include gradient-coin;
+  border-radius: $radius-round;
+  @include flex-center;
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+  box-shadow: $shadow-coin;
+}
+
+.coinAmount {
+  font-size: $font-size-xl;
+  color: $color-coin;
+  font-weight: $font-weight-bold;
+}
+
+.paymentOptions {
+  margin-bottom: $spacing-xl;
+}
+
+.optionTitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-md;
+}
+
+.optionCard {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
+  @include button-active;
+  transition: all $transition-base;
+
+  &.selected {
+    border-color: $color-primary;
+    background: rgba(123, 95, 253, 0.05);
+  }
+
+  &.disabled {
+    opacity: 0.5;
+  }
+}
+
+.optionRadio {
+  width: 36rpx;
+  height: 36rpx;
+  border: 3rpx solid $color-border;
+  border-radius: $radius-round;
+  margin-right: $spacing-lg;
+  @include flex-center;
+  flex-shrink: 0;
+  transition: all $transition-base;
+
+  .selected & {
+    border-color: $color-primary;
+  }
+
+  &::after {
+    content: '';
+    width: 20rpx;
+    height: 20rpx;
+    border-radius: $radius-round;
+    background: $color-primary;
+    transform: scale(0);
+    transition: transform $transition-base;
+  }
+
+  .selected &::after {
+    transform: scale(1);
+  }
+}
+
+.optionContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.optionName {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.optionBalance {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.optionCoin {
+  font-size: $font-size-base;
+  color: $color-coin;
+  font-weight: $font-weight-semibold;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.cancelBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  @include button-active;
+}
+
+.confirmBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  @include gradient-primary;
+  color: $color-text-white;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  @include button-active;
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}

@@ -1,0 +1,31 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $page-padding;
+}
+
+.content {
+  text-align: center;
+}
+
+.icon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-xl;
+  opacity: 0.5;
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.desc {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+}

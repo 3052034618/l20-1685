@@ -1,0 +1,155 @@
+@use '@/styles/variables.scss' as *;
+
+.bookCard {
+  @include card-base;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  @include button-active;
+}
+
+.bookContent {
+  display: flex;
+  gap: $spacing-lg;
+}
+
+.bookCover {
+  width: 160rpx;
+  height: 220rpx;
+  border-radius: $radius-md;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+
+  Image {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}
+
+.bookInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bookHeader {
+  @include flex-between;
+  margin-bottom: $spacing-sm;
+}
+
+.bookTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  flex: 1;
+  margin-right: $spacing-sm;
+}
+
+.updateTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.bookAuthor {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-md;
+}
+
+.chapterTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $color-primary;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis;
+}
+
+.progressSection {
+  margin-bottom: $spacing-md;
+}
+
+.progressLabel {
+  @include flex-between;
+  margin-bottom: $spacing-xs;
+}
+
+.progressText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.previewRatio {
+  font-size: $font-size-xs;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
+.progressBar {
+  width: 100%;
+  height: $progress-height;
+  background: $color-bg-soft;
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-round;
+  transition: width $transition-base ease;
+}
+
+.coinSection {
+  @include flex-between;
+  align-items: flex-end;
+}
+
+.coinInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.coinIcon {
+  width: $coin-size;
+  height: $coin-size;
+  @include gradient-coin;
+  border-radius: $radius-round;
+  @include flex-center;
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+  box-shadow: $shadow-coin;
+}
+
+.coinRequired {
+  font-size: $font-size-base;
+  color: $color-coin;
+  font-weight: $font-weight-semibold;
+}
+
+.deficitTip {
+  display: flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba(255, 125, 0, 0.1);
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  color: $color-warning;
+  font-weight: $font-weight-medium;
+}
+
+.enoughTip {
+  display: flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba(0, 180, 42, 0.1);
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}

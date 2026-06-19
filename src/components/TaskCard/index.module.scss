@@ -1,0 +1,145 @@
+@use '@/styles/variables.scss' as *;
+
+.taskCard {
+  @include card-base;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  @include button-active;
+}
+
+.taskContent {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.taskIcon {
+  width: 88rpx;
+  height: 88rpx;
+  @include flex-center;
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+  font-size: 40rpx;
+
+  &.iconCheckin {
+    background: linear-gradient(135deg, #FFB84D 0%, #FFD78A 100%);
+  }
+
+  &.iconComment {
+    background: linear-gradient(135deg, #7B5FFD 0%, #9D8AFF 100%);
+  }
+
+  &.iconShare {
+    background: linear-gradient(135deg, #00B42A 0%, #40D162 100%);
+  }
+
+  &.iconRead {
+    background: linear-gradient(135deg, #FF7D00 0%, #FFA94D 100%);
+  }
+}
+
+.taskInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.taskHeader {
+  @include flex-between;
+  margin-bottom: $spacing-xs;
+}
+
+.taskTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.taskReward {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-shrink: 0;
+}
+
+.coinBadge {
+  width: 32rpx;
+  height: 32rpx;
+  @include gradient-coin;
+  border-radius: $radius-round;
+  @include flex-center;
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}
+
+.rewardText {
+  font-size: $font-size-base;
+  color: $color-coin;
+  font-weight: $font-weight-semibold;
+}
+
+.taskDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(1);
+}
+
+.progressSection {
+  @include flex-between;
+  align-items: center;
+}
+
+.progressInfo {
+  flex: 1;
+  margin-right: $spacing-lg;
+}
+
+.progressBar {
+  width: 100%;
+  height: 12rpx;
+  background: $color-bg-soft;
+  border-radius: $radius-round;
+  overflow: hidden;
+  margin-bottom: $spacing-xs;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-round;
+  transition: width $transition-base ease;
+}
+
+.progressText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.actionButton {
+  @include button-reset;
+  height: $button-height-sm;
+  min-width: 140rpx;
+  padding: 0 $spacing-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  flex-shrink: 0;
+  @include button-active;
+
+  &.btnPrimary {
+    @include gradient-primary;
+    color: $color-text-white;
+  }
+
+  &.btnCompleted {
+    background: rgba(0, 180, 42, 0.1);
+    color: $color-success;
+  }
+
+  &.btnDisabled {
+    background: $color-bg-hover;
+    color: $color-text-disabled;
+  }
+}

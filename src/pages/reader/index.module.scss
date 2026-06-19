@@ -1,0 +1,305 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $reading-bg;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  border-bottom: 2rpx solid $color-divider;
+  box-shadow: $shadow-float;
+}
+
+.bookInfo {
+  @include flex-between;
+  margin-bottom: $spacing-sm;
+}
+
+.bookTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  flex: 1;
+}
+
+.chapterNav {
+  display: flex;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.navBtn {
+  @include button-reset;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  background: $color-bg-soft;
+  color: $color-text-secondary;
+  font-size: $font-size-xs;
+  @include button-active;
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.chapterTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.chapterMeta {
+  @include flex-between;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.coinBadge {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba(255, 184, 77, 0.1);
+  border-radius: $radius-sm;
+  color: $color-coin;
+  font-weight: $font-weight-medium;
+}
+
+.coinIcon {
+  width: 24rpx;
+  height: 24rpx;
+  @include gradient-coin;
+  border-radius: $radius-round;
+  @include flex-center;
+  font-size: 18rpx;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}
+
+.content {
+  padding: $spacing-xl $page-padding $spacing-xxl;
+}
+
+.readingContent {
+  font-size: $font-size-base;
+  line-height: $line-height-reading;
+  color: $color-text-primary;
+}
+
+.paragraph {
+  margin-bottom: $spacing-lg;
+  text-indent: 2em;
+  text-align: justify;
+}
+
+.previewSection {
+  position: relative;
+}
+
+.previewIndicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba(0, 180, 42, 0.1);
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
+.lockSection {
+  margin: $spacing-xl 0;
+  padding: $spacing-xl;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(123, 95, 253, 0.05) 100%
+  );
+  border-radius: $radius-lg;
+  border: 2rpx dashed $color-border-light;
+  text-align: center;
+}
+
+.lockIcon {
+  font-size: 64rpx;
+  margin-bottom: $spacing-md;
+}
+
+.lockTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.lockDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-lg;
+}
+
+.coinRequired {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.coinBadgeLarge {
+  width: 48rpx;
+  height: 48rpx;
+  @include gradient-coin;
+  border-radius: $radius-round;
+  @include flex-center;
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+  box-shadow: $shadow-coin;
+}
+
+.coinAmount {
+  font-size: $font-size-xl;
+  color: $color-coin;
+  font-weight: $font-weight-bold;
+}
+
+.unlockButton {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  @include gradient-primary;
+  color: $color-text-white;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  @include button-active;
+  box-shadow: $shadow-float;
+}
+
+.goTaskButton {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  background: $color-bg-soft;
+  color: $color-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  @include button-active;
+  margin-top: $spacing-md;
+}
+
+.unlockedSection {
+  margin: $spacing-xl 0;
+  padding: $spacing-md $spacing-lg;
+  background: rgba(0, 180, 42, 0.08);
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.unlockedIcon {
+  font-size: 32rpx;
+}
+
+.unlockedText {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
+.emptyState {
+  padding: $spacing-xxl $page-padding;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-lg;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.emptyDesc {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xl;
+}
+
+.emptyButton {
+  @include button-reset;
+  display: inline-flex;
+  height: $button-height-md;
+  padding: 0 $spacing-xl;
+  border-radius: $radius-button;
+  @include gradient-primary;
+  color: $color-text-white;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  @include button-active;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  background: $color-bg-card;
+  border-top: 2rpx solid $color-divider;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.balanceInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.balanceItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.balanceLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.balanceValue {
+  font-size: $font-size-base;
+  color: $color-coin;
+  font-weight: $font-weight-semibold;
+}
+
+.progressInfo {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.readingProgress {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
