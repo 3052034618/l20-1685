@@ -26,6 +26,9 @@ function formatTime(ts: number): string {
 
 export const TransactionItem: React.FC<TransactionItemProps> = ({ record }) => {
   const isReward = record.type === 'reward';
+  const taskCoinUsed = record.taskCoinUsed || 0;
+  const balanceUsed = record.balanceUsed || 0;
+  const hasBreakdown = !isReward && (taskCoinUsed + balanceUsed) > 0;
 
   return (
     <View className={styles.item}>
@@ -36,16 +39,16 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ record }) => {
         <View className={styles.info}>
           <Text className={styles.title}>{record.description}</Text>
           <Text className={styles.time}>{formatTime(record.createdAt)}</Text>
-          {(record.taskCoinUsed || record.balanceUsed) && record.taskCoinUsed + record.balanceUsed > 0 && (
+          {hasBreakdown && (
             <View className={styles.breakdown}>
-              {record.taskCoinUsed && record.taskCoinUsed > 0 && (
+              {taskCoinUsed > 0 && (
                 <Text className={styles.breakdownItem}>
-                  任务书币 {record.taskCoinUsed > 0 ? '-' : ''}{record.taskCoinUsed}
+                  任务书币 -{taskCoinUsed}
                 </Text>
               )}
-              {record.balanceUsed && record.balanceUsed > 0 && (
+              {balanceUsed > 0 && (
                 <Text className={styles.breakdownItem}>
-                  余额 {record.balanceUsed > 0 ? '-' : ''}{record.balanceUsed}
+                  余额 -{balanceUsed}
                 </Text>
               )}
             </View>

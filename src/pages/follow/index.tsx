@@ -24,7 +24,7 @@ const FollowPage: React.FC = () => {
   const booksWithStatus = useMemo(() => {
     return state.books.filter((book) => book.isFollowed).map((book) => {
       const isUnlocked = state.user.unlockedChapters.includes(book.latestChapter.id);
-      const cost = book.latestChapter.cost;
+      const cost = book.latestChapter.coinRequired;
       const canUseTask = taskCoin >= cost;
       const canUseBalance = balance >= cost;
       const canUseCombo = !canUseTask && !canUseBalance && totalCoin >= cost;
@@ -87,7 +87,7 @@ const FollowPage: React.FC = () => {
     Taro.switchTab({ url: '/pages/reader/index' });
   };
 
-  console.log('[FollowPage] Rendering, books count:', books.length);
+  console.log('[FollowPage] Rendering, books count:', booksWithStatus.length);
 
   return (
     <View className={styles.page}>

@@ -20,14 +20,9 @@ const ReaderPage: React.FC = () => {
   const { taskCoin, balance, unlockedChapters, readingProgress: allProgress } = state.user;
   const { books, currentChapter: stateChapter } = state;
 
-  const findBookByChapterId = (chapterId: string): Book | undefined => {
+  const findBookByChapterId = useCallback((chapterId: string): Book | undefined => {
     return books.find((b) => b.latestChapter.id === chapterId);
-  };
-
-  const currentBook = useMemo(() => {
-    if (!currentChapter) return undefined;
-    return findBookByChapterId(currentChapter.id);
-  }, [currentChapter, books]);
+  }, [books]);
 
   const currentChapter: Chapter | null = useMemo(() => {
     if (stateChapter) {
@@ -48,7 +43,12 @@ const ReaderPage: React.FC = () => {
       };
     }
     return null;
-  }, [stateChapter, books, unlockedChapters]);
+  }, [stateChapter, books, unlockedChapters, findBookByChapterId]);
+
+  const currentBook = useMemo(() => {
+    if (!currentChapter) return undefined;
+    return findBookByChapterId(currentChapter.id);
+  }, [currentChapter, findBookByChapterId]);
 
   const isUnlocked = currentChapter ? unlockedChapters.includes(currentChapter.id) : false;
 
@@ -103,7 +103,6 @@ const ReaderPage: React.FC = () => {
 
   useDidShow(() => {
     console.log('[ReaderPage] Page did show, chapter:', currentChapter?.title);
-    loadDefaultChapter();
   });
 
   const handleScroll = (e: any) => {
@@ -208,13 +207,8 @@ const ReaderPage: React.FC = () => {
 
     dispatch({ type: 'SET_CURRENT_CHAPTER', payload: nextChapter });
     setReadingProgress(0);
-
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        top: 0,
-        animated: false,
-      });
-    }
+    setInitialScrollTop(0);
+    setScrollKey((k) => k + 1);
   };
 
   const handlePrevChapter = () => switchChapter(-1);
